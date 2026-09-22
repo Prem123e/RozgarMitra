@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
+import '../models/job.dart';
+import 'job_posted_success_screen.dart';
 
 class PostJobScreen extends StatefulWidget {
   final String selectedLanguage;
@@ -98,7 +100,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 30),
 
-                // Job Title
                 _buildTextField(
                   controller: jobTitleController,
                   label: AppTranslations.get(
@@ -114,7 +115,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Job Description
                 _buildTextField(
                   controller: descriptionController,
                   label: AppTranslations.get(
@@ -131,7 +131,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Work Location
                 _buildTextField(
                   controller: locationController,
                   label: AppTranslations.get(
@@ -147,7 +146,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Daily Wage
                 _buildTextField(
                   controller: wageController,
                   label: AppTranslations.get(
@@ -164,7 +162,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Number of Workers
                 _buildTextField(
                   controller: workersController,
                   label: AppTranslations.get(
@@ -181,7 +178,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Work Date
                 _buildTextField(
                   controller: dateController,
                   label: AppTranslations.get(
@@ -197,7 +193,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 16),
 
-                // Required Skill
                 _buildTextField(
                   controller: skillController,
                   label: AppTranslations.get(
@@ -213,7 +208,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
                 const SizedBox(height: 30),
 
-                // Publish Job
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -279,14 +273,32 @@ class _PostJobScreenState extends State<PostJobScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppTranslations.get(
-            widget.selectedLanguage,
-            'jobDetailsValid',
-          ),
-        ),
+    final job = Job(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: jobTitleController.text.trim(),
+      description: descriptionController.text.trim(),
+      location: locationController.text.trim(),
+      dailyWage: double.parse(
+        wageController.text.trim(),
+      ),
+      numberOfWorkers: int.parse(
+        workersController.text.trim(),
+      ),
+      workDate: dateController.text.trim(),
+      requiredSkill: skillController.text.trim(),
+      employerName: 'Demo Employer',
+      status: 'Published',
+      createdAt: DateTime.now(),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return JobPostedSuccessScreen(
+            job: job,
+          );
+        },
       ),
     );
   }

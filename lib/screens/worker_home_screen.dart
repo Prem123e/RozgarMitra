@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
+import 'job_list_screen.dart';
+import 'my_applications_screen.dart';
 
 class WorkerHomeScreen extends StatelessWidget {
   final String selectedLanguage;
@@ -60,6 +62,18 @@ class WorkerHomeScreen extends StatelessWidget {
                   selectedLanguage,
                   'findJobs',
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return JobListScreen(
+                          selectedLanguage: selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 16),
@@ -71,6 +85,18 @@ class WorkerHomeScreen extends StatelessWidget {
                   selectedLanguage,
                   'myApplications',
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MyApplicationsScreen(
+                          selectedLanguage: selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 16),
@@ -82,6 +108,9 @@ class WorkerHomeScreen extends StatelessWidget {
                   selectedLanguage,
                   'myWork',
                 ),
+                onTap: () {
+                  _showComingSoon(context);
+                },
               ),
 
               const SizedBox(height: 16),
@@ -93,6 +122,9 @@ class WorkerHomeScreen extends StatelessWidget {
                   selectedLanguage,
                   'myProfile',
                 ),
+                onTap: () {
+                  _showComingSoon(context);
+                },
               ),
             ],
           ),
@@ -105,19 +137,12 @@ class WorkerHomeScreen extends StatelessWidget {
     BuildContext context, {
     required IconData icon,
     required String title,
+    required VoidCallback onTap,
   }) {
     return Card(
       elevation: 3,
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'This feature will be connected soon.',
-              ),
-            ),
-          );
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -127,9 +152,7 @@ class WorkerHomeScreen extends StatelessWidget {
                 icon,
                 size: 42,
               ),
-
               const SizedBox(width: 20),
-
               Expanded(
                 child: Text(
                   title,
@@ -139,13 +162,22 @@ class WorkerHomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const Icon(
                 Icons.arrow_forward_ios,
                 size: 20,
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'This feature will be connected soon.',
         ),
       ),
     );
