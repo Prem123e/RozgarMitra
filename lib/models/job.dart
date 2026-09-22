@@ -1,19 +1,18 @@
 class Job {
   final String id;
 
-  // Original content entered by the employer.
   final String originalLanguage;
   final String originalTitle;
   final String originalDescription;
   final String originalLocation;
   final String originalRequiredSkill;
 
-  // Translated content for workers.
   final Map<String, JobTranslation> translations;
 
   final double dailyWage;
   final int numberOfWorkers;
   final String workDate;
+  final String contractEndDate;
   final String employerName;
   final String status;
   final DateTime createdAt;
@@ -29,6 +28,7 @@ class Job {
     required this.dailyWage,
     required this.numberOfWorkers,
     required this.workDate,
+    required this.contractEndDate,
     required this.employerName,
     required this.status,
     required this.createdAt,
