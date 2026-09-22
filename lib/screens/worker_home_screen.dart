@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../localization/app_translations.dart';
 import 'job_list_screen.dart';
 import 'my_applications_screen.dart';
+import 'my_contracts_screen.dart';
 
 class WorkerHomeScreen extends StatelessWidget {
   final String selectedLanguage;
@@ -28,7 +29,8 @@ class WorkerHomeScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 AppTranslations.get(
@@ -40,9 +42,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               Text(
                 AppTranslations.get(
                   selectedLanguage,
@@ -52,9 +52,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   fontSize: 18,
                 ),
               ),
-
               const SizedBox(height: 30),
-
               _buildDashboardCard(
                 context,
                 icon: Icons.search,
@@ -68,19 +66,18 @@ class WorkerHomeScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) {
                         return JobListScreen(
-                          selectedLanguage: selectedLanguage,
+                          selectedLanguage:
+                              selectedLanguage,
                         );
                       },
                     ),
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
-                icon: Icons.description,
+                icon: Icons.assignment,
                 title: AppTranslations.get(
                   selectedLanguage,
                   'myApplications',
@@ -91,19 +88,37 @@ class WorkerHomeScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) {
                         return MyApplicationsScreen(
-                          selectedLanguage: selectedLanguage,
+                          selectedLanguage:
+                              selectedLanguage,
                         );
                       },
                     ),
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
-                icon: Icons.work,
+                icon: Icons.description,
+                title: 'My Contracts',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MyContractsScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildDashboardCard(
+                context,
+                icon: Icons.work_history,
                 title: AppTranslations.get(
                   selectedLanguage,
                   'myWork',
@@ -112,9 +127,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   _showComingSoon(context);
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
                 icon: Icons.person,
@@ -173,7 +186,9 @@ class WorkerHomeScreen extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context) {
+  void _showComingSoon(
+    BuildContext context,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(

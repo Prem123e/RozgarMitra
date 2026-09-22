@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/application.dart';
+import '../models/contract.dart';
 import '../services/application_store.dart';
+import '../services/contract_store.dart';
 import '../services/job_store.dart';
 import '../services/job_translation_service.dart';
 
@@ -105,6 +107,12 @@ class _EmployerApplicationsScreenState
 
     final isApplied =
         application.status == 'Applied';
+
+    final hasContract =
+        ContractStore.hasContractForApplication(
+      jobId: job.id,
+      workerName: application.workerName,
+    );
 
     return Card(
       elevation: 3,
@@ -220,9 +228,8 @@ class _EmployerApplicationsScreenState
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        _updateApplicationStatus(
+                        _acceptApplication(
                           application,
-                          'Accepted',
                         );
                       },
                       icon: const Icon(
@@ -236,7 +243,168 @@ class _EmployerApplicationsScreenState
                 ],
               ),
             ],
+            if (application.status == 'Accepted' &&
+                hasContract) ...[
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              _buildContractSummary(
+                application,
+              ),
+            ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContractSummary(
+    JobApplication application,
+  ) {
+    final contract = _getContract(
+      application,
+    );
+
+    if (contract == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.green.shade50,
+      ),
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.description,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Contract Created',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Daily Wage: ₹${contract.dailyWage.toStringAsFixed(0)}',
+          ),
+          Text(
+            'Contract Days: ${contract.totalDays}',
+          ),
+          Text(
+            'Total Contract Value: '
+            '₹${contract.totalContractValue.toStringAsFixed(0)}',
+          ),
+          Text(
+            'Initial 3-Day Escrow Requirement: '
+            '₹${contract.initialEscrowAmount.toStringAsFixed(0)}',
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Status: ${contract.status}',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  JobContract? _getContract(
+    JobApplication application,
+  ) {
+    for (final contract in ContractStore.contracts) {
+      if (contract.job.id == application.job.id &&
+          contract.workerName ==
+              application.workerName) {
+        return contract;
+      }
+    }
+
+    return null;
+  }
+
+  void _acceptApplication(
+    JobApplication application,
+  ) {
+    final alreadyHasContract =
+        ContractStore.hasContractForApplication(
+      jobId: application.job.id,
+      workerName: application.workerName,
+    );
+
+    if (alreadyHasContract) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'A contract already exists for this worker.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final contract = JobContract(
+      id: DateTime.now()
+          .millisecondsSinceEpoch
+          .toString(),
+      job: application.job,
+      workerName: application.workerName,
+      employerName: application.job.employerName,
+      dailyWage: application.job.dailyWage,
+      totalDays: 1,
+      dailyWorkingHours: '8 hours',
+      startDate: application.job.workDate,
+      endDate: application.job.workDate,
+      status: 'Created',
+      createdAt: DateTime.now(),
+    );
+
+    setState(() {
+      application.updateStatus(
+        'Accepted',
+      );
+
+      ContractStore.addContract(
+        contract,
+      );
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Application accepted and contract created successfully.',
+        ),
+      ),
+    );
+  }
+
+  void _updateApplicationStatus(
+    JobApplication application,
+    String newStatus,
+  ) {
+    setState(() {
+      application.updateStatus(
+        newStatus,
+      );
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Application ${newStatus.toLowerCase()} successfully.',
         ),
       ),
     );
@@ -318,25 +486,6 @@ class _EmployerApplicationsScreenState
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _updateApplicationStatus(
-    JobApplication application,
-    String newStatus,
-  ) {
-    setState(() {
-      application.updateStatus(
-        newStatus,
-      );
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Application ${newStatus.toLowerCase()} successfully.',
-        ),
       ),
     );
   }
