@@ -76,6 +76,9 @@ class MyApplicationsScreen extends StatelessWidget {
     JobApplication application,
   ) {
     final job = application.job;
+    final translation = job.getTranslation(
+      selectedLanguage,
+    );
 
     return Card(
       elevation: 3,
@@ -97,7 +100,7 @@ class MyApplicationsScreen extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    job.title,
+                    translation.title,
                     style: const TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.bold,
@@ -109,37 +112,33 @@ class MyApplicationsScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 18),
-
             _buildDetailRow(
               Icons.location_on,
               'Location',
-              job.location,
+              translation.location,
             ),
-
             _buildDetailRow(
               Icons.currency_rupee,
               'Daily Wage',
               '₹${job.dailyWage.toStringAsFixed(0)}',
             ),
-
             _buildDetailRow(
               Icons.calendar_today,
               'Work Date',
               job.workDate,
             ),
-
             _buildDetailRow(
               Icons.engineering,
               'Skill',
-              job.requiredSkill,
+              translation.requiredSkill,
             ),
-
             _buildDetailRow(
               Icons.access_time,
               'Applied',
-              _formatDate(application.appliedAt),
+              _formatDate(
+                application.appliedAt,
+              ),
             ),
           ],
         ),

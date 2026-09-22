@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
 import '../models/job.dart';
+import '../services/job_store.dart';
 import 'job_posted_success_screen.dart';
 
 class PostJobScreen extends StatefulWidget {
@@ -85,9 +86,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   AppTranslations.get(
                     language,
@@ -97,9 +96,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     fontSize: 16,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 _buildTextField(
                   controller: jobTitleController,
                   label: AppTranslations.get(
@@ -112,9 +109,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   ),
                   icon: Icons.work,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: descriptionController,
                   label: AppTranslations.get(
@@ -128,9 +123,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   icon: Icons.description,
                   maxLines: 4,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: locationController,
                   label: AppTranslations.get(
@@ -143,9 +136,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   ),
                   icon: Icons.location_on,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: wageController,
                   label: AppTranslations.get(
@@ -159,9 +150,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   icon: Icons.currency_rupee,
                   keyboardType: TextInputType.number,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: workersController,
                   label: AppTranslations.get(
@@ -175,9 +164,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   icon: Icons.people,
                   keyboardType: TextInputType.number,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: dateController,
                   label: AppTranslations.get(
@@ -190,9 +177,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   ),
                   icon: Icons.calendar_today,
                 ),
-
                 const SizedBox(height: 16),
-
                 _buildTextField(
                   controller: skillController,
                   label: AppTranslations.get(
@@ -205,9 +190,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   ),
                   icon: Icons.engineering,
                 ),
-
                 const SizedBox(height: 30),
-
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -227,7 +210,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
               ],
             ),
@@ -274,10 +256,22 @@ class _PostJobScreenState extends State<PostJobScreen> {
     }
 
     final job = Job(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: jobTitleController.text.trim(),
-      description: descriptionController.text.trim(),
-      location: locationController.text.trim(),
+      id: DateTime.now()
+          .millisecondsSinceEpoch
+          .toString(),
+      originalLanguage: widget.selectedLanguage,
+      originalTitle: jobTitleController.text.trim(),
+      originalDescription: descriptionController.text.trim(),
+      originalLocation: locationController.text.trim(),
+      originalRequiredSkill: skillController.text.trim(),
+      translations: {
+        widget.selectedLanguage: JobTranslation(
+          title: jobTitleController.text.trim(),
+          description: descriptionController.text.trim(),
+          location: locationController.text.trim(),
+          requiredSkill: skillController.text.trim(),
+        ),
+      },
       dailyWage: double.parse(
         wageController.text.trim(),
       ),
@@ -285,11 +279,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
         workersController.text.trim(),
       ),
       workDate: dateController.text.trim(),
-      requiredSkill: skillController.text.trim(),
       employerName: 'Demo Employer',
       status: 'Published',
       createdAt: DateTime.now(),
     );
+
+    JobStore.addJob(job);
 
     Navigator.push(
       context,

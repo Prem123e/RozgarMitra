@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/application.dart';
 import '../models/job.dart';
 import '../services/application_store.dart';
+import '../services/job_store.dart';
+import '../services/job_translation_service.dart';
 
 class JobListScreen extends StatelessWidget {
   final String selectedLanguage;
@@ -12,53 +14,9 @@ class JobListScreen extends StatelessWidget {
     required this.selectedLanguage,
   });
 
-  List<Job> _getSampleJobs() {
-    return [
-      Job(
-        id: 'JOB001',
-        title: 'Farm Worker',
-        description: 'Harvesting work on agricultural land.',
-        location: 'Karimnagar',
-        dailyWage: 800,
-        numberOfWorkers: 5,
-        workDate: '25-09-2026',
-        requiredSkill: 'Farming',
-        employerName: 'Local Farmer',
-        status: 'Published',
-        createdAt: DateTime.now(),
-      ),
-      Job(
-        id: 'JOB002',
-        title: 'Construction Worker',
-        description: 'General construction and site assistance.',
-        location: 'Warangal',
-        dailyWage: 900,
-        numberOfWorkers: 8,
-        workDate: '26-09-2026',
-        requiredSkill: 'Construction',
-        employerName: 'ABC Constructions',
-        status: 'Published',
-        createdAt: DateTime.now(),
-      ),
-      Job(
-        id: 'JOB003',
-        title: 'Vegetable Farm Worker',
-        description: 'Vegetable harvesting and packing work.',
-        location: 'Siddipet',
-        dailyWage: 700,
-        numberOfWorkers: 10,
-        workDate: '27-09-2026',
-        requiredSkill: 'Agriculture',
-        employerName: 'Green Farm',
-        status: 'Published',
-        createdAt: DateTime.now(),
-      ),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
-    final jobs = _getSampleJobs();
+    final jobs = JobStore.jobs;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,17 +26,53 @@ class JobListScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: jobs.length,
-          itemBuilder: (context, index) {
-            final job = jobs[index];
+        child: jobs.isEmpty
+            ? _buildEmptyState()
+            : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: jobs.length,
+                itemBuilder: (context, index) {
+                  final job = jobs[index];
 
-            return _buildJobCard(
-              context,
-              job,
-            );
-          },
+                  return _buildJobCard(
+                    context,
+                    job,
+                  );
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.work_outline,
+              size: 70,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'No jobs available',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'New jobs posted by employers will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -88,7 +82,14 @@ class JobListScreen extends StatelessWidget {
     BuildContext context,
     Job job,
   ) {
-    final alreadyApplied = ApplicationStore.hasAppliedToJob(
+    final translation =
+        JobTranslationService.getTranslationForWorker(
+      job: job,
+      workerLanguage: selectedLanguage,
+    );
+
+    final alreadyApplied =
+        ApplicationStore.hasAppliedToJob(
       job.id,
     );
 
@@ -120,7 +121,7 @@ class JobListScreen extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      job.title,
+                      translation.title,
                       style: const TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.bold,
@@ -136,9 +137,7 @@ class JobListScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 14),
-
               Row(
                 children: [
                   const Icon(
@@ -148,7 +147,7 @@ class JobListScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      job.location,
+                      translation.location,
                       style: const TextStyle(
                         fontSize: 16,
                       ),
@@ -156,9 +155,7 @@ class JobListScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 8),
-
               Row(
                 children: [
                   const Icon(
@@ -174,9 +171,7 @@ class JobListScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 8),
-
               Row(
                 children: [
                   const Icon(
@@ -186,7 +181,7 @@ class JobListScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      job.requiredSkill,
+                      translation.requiredSkill,
                       style: const TextStyle(
                         fontSize: 16,
                       ),
@@ -194,9 +189,7 @@ class JobListScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 14),
-
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
@@ -223,7 +216,14 @@ class JobListScreen extends StatelessWidget {
     BuildContext context,
     Job job,
   ) {
-    final alreadyApplied = ApplicationStore.hasAppliedToJob(
+    final translation =
+        JobTranslationService.getTranslationForWorker(
+      job: job,
+      workerLanguage: selectedLanguage,
+    );
+
+    final alreadyApplied =
+        ApplicationStore.hasAppliedToJob(
       job.id,
     );
 
@@ -243,24 +243,21 @@ class JobListScreen extends StatelessWidget {
                       width: 45,
                       height: 5,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius:
+                            BorderRadius.circular(10),
                         color: Colors.grey,
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
                   Text(
-                    job.title,
+                    translation.title,
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Text(
                     '₹${job.dailyWage.toStringAsFixed(0)} / day',
                     style: const TextStyle(
@@ -268,47 +265,38 @@ class JobListScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
                   _buildDetail(
                     Icons.description,
                     'Description',
-                    job.description,
+                    translation.description,
                   ),
-
                   _buildDetail(
                     Icons.location_on,
                     'Location',
-                    job.location,
+                    translation.location,
                   ),
-
                   _buildDetail(
                     Icons.calendar_today,
                     'Work Date',
                     job.workDate,
                   ),
-
                   _buildDetail(
                     Icons.people,
                     'Workers Required',
                     '${job.numberOfWorkers}',
                   ),
-
                   _buildDetail(
                     Icons.engineering,
                     'Required Skill',
-                    job.requiredSkill,
+                    translation.requiredSkill,
                   ),
-
                   _buildDetail(
                     Icons.business,
                     'Employer',
                     job.employerName,
                   ),
-
                   const SizedBox(height: 20),
-
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -336,7 +324,6 @@ class JobListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 10),
                 ],
               ),
@@ -367,10 +354,16 @@ class JobListScreen extends StatelessWidget {
 
     Navigator.pop(context);
 
+    final translation =
+        JobTranslationService.getTranslationForWorker(
+      job: job,
+      workerLanguage: selectedLanguage,
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Application submitted for ${job.title}',
+          'Application submitted for ${translation.title}',
         ),
       ),
     );
@@ -395,7 +388,8 @@ class JobListScreen extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   label,

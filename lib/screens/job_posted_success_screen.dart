@@ -12,9 +12,15 @@ class JobPostedSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translation = job.getTranslation(
+      job.originalLanguage,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Job Posted'),
+        title: const Text(
+          'Job Posted',
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -23,7 +29,6 @@ class JobPostedSuccessScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 20),
-
               Container(
                 width: 90,
                 height: 90,
@@ -37,9 +42,7 @@ class JobPostedSuccessScreen extends StatelessWidget {
                   color: Colors.green,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               const Text(
                 'Job Posted Successfully!',
                 textAlign: TextAlign.center,
@@ -48,9 +51,7 @@ class JobPostedSuccessScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               const Text(
                 'Your job is now available for eligible workers.',
                 textAlign: TextAlign.center,
@@ -58,9 +59,7 @@ class JobPostedSuccessScreen extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-
               const SizedBox(height: 30),
-
               Card(
                 elevation: 3,
                 child: Padding(
@@ -75,51 +74,47 @@ class JobPostedSuccessScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
                       _buildDetailRow(
                         Icons.work,
                         'Job Title',
-                        job.title,
+                        translation.title,
                       ),
-
                       _buildDetailRow(
                         Icons.description,
                         'Description',
-                        job.description,
+                        translation.description,
                       ),
-
                       _buildDetailRow(
                         Icons.location_on,
                         'Location',
-                        job.location,
+                        translation.location,
                       ),
-
                       _buildDetailRow(
                         Icons.currency_rupee,
                         'Daily Wage',
                         '₹${job.dailyWage.toStringAsFixed(0)}',
                       ),
-
                       _buildDetailRow(
                         Icons.people,
                         'Workers Required',
                         '${job.numberOfWorkers}',
                       ),
-
                       _buildDetailRow(
                         Icons.calendar_today,
                         'Work Date',
                         job.workDate,
                       ),
-
                       _buildDetailRow(
                         Icons.engineering,
                         'Required Skill',
-                        job.requiredSkill,
+                        translation.requiredSkill,
                       ),
-
+                      _buildDetailRow(
+                        Icons.language,
+                        'Job Language',
+                        job.originalLanguage,
+                      ),
                       _buildDetailRow(
                         Icons.verified,
                         'Status',
@@ -129,9 +124,7 @@ class JobPostedSuccessScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -150,7 +143,6 @@ class JobPostedSuccessScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -165,7 +157,9 @@ class JobPostedSuccessScreen extends StatelessWidget {
     String value,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.only(
+        bottom: 18,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
