@@ -4,8 +4,9 @@ class JobApplication {
   final String id;
   final Job job;
   final String workerName;
-  final String status;
+  String status;
   final DateTime appliedAt;
+  DateTime? statusUpdatedAt;
 
   JobApplication({
     required this.id,
@@ -13,5 +14,13 @@ class JobApplication {
     required this.workerName,
     required this.status,
     required this.appliedAt,
+    this.statusUpdatedAt,
   });
+
+  void updateStatus(
+    String newStatus,
+  ) {
+    status = newStatus;
+    statusUpdatedAt = DateTime.now();
+  }
 }

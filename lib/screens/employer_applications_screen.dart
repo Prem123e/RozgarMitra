@@ -5,7 +5,7 @@ import '../services/application_store.dart';
 import '../services/job_store.dart';
 import '../services/job_translation_service.dart';
 
-class EmployerApplicationsScreen extends StatelessWidget {
+class EmployerApplicationsScreen extends StatefulWidget {
   final String selectedLanguage;
 
   const EmployerApplicationsScreen({
@@ -13,6 +13,13 @@ class EmployerApplicationsScreen extends StatelessWidget {
     required this.selectedLanguage,
   });
 
+  @override
+  State<EmployerApplicationsScreen> createState() =>
+      _EmployerApplicationsScreenState();
+}
+
+class _EmployerApplicationsScreenState
+    extends State<EmployerApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     final applications = ApplicationStore.applications;
@@ -93,8 +100,11 @@ class EmployerApplicationsScreen extends StatelessWidget {
     final translation =
         JobTranslationService.getTranslationForWorker(
       job: job,
-      workerLanguage: selectedLanguage,
+      workerLanguage: widget.selectedLanguage,
     );
+
+    final isApplied =
+        application.status == 'Applied';
 
     return Card(
       elevation: 3,
@@ -176,6 +186,56 @@ class EmployerApplicationsScreen extends StatelessWidget {
                 application.appliedAt,
               ),
             ),
+            if (isApplied) ...[
+              const SizedBox(height: 8),
+              const Divider(),
+              const SizedBox(height: 8),
+              const Text(
+                'Manage Application',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        _updateApplicationStatus(
+                          application,
+                          'Rejected',
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.close,
+                      ),
+                      label: const Text(
+                        'Reject',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _updateApplicationStatus(
+                          application,
+                          'Accepted',
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.check,
+                      ),
+                      label: const Text(
+                        'Accept',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -185,6 +245,20 @@ class EmployerApplicationsScreen extends StatelessWidget {
   Widget _buildStatusBadge(
     String status,
   ) {
+    Color backgroundColor;
+    Color textColor;
+
+    if (status == 'Accepted') {
+      backgroundColor = Colors.green.shade100;
+      textColor = Colors.green.shade800;
+    } else if (status == 'Rejected') {
+      backgroundColor = Colors.red.shade100;
+      textColor = Colors.red.shade800;
+    } else {
+      backgroundColor = Colors.orange.shade100;
+      textColor = Colors.orange.shade800;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -192,13 +266,13 @@ class EmployerApplicationsScreen extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Colors.green.shade100,
+        color: backgroundColor,
       ),
       child: Text(
         status,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: Colors.green.shade800,
+          color: textColor,
         ),
       ),
     );
@@ -244,6 +318,25 @@ class EmployerApplicationsScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _updateApplicationStatus(
+    JobApplication application,
+    String newStatus,
+  ) {
+    setState(() {
+      application.updateStatus(
+        newStatus,
+      );
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Application ${newStatus.toLowerCase()} successfully.',
+        ),
       ),
     );
   }
