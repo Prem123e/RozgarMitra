@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
+import 'employer_applications_screen.dart';
 import 'post_job_screen.dart';
 
 class EmployerHomeScreen extends StatelessWidget {
@@ -27,7 +28,8 @@ class EmployerHomeScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 AppTranslations.get(
@@ -39,9 +41,7 @@ class EmployerHomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               Text(
                 AppTranslations.get(
                   selectedLanguage,
@@ -51,9 +51,7 @@ class EmployerHomeScreen extends StatelessWidget {
                   fontSize: 18,
                 ),
               ),
-
               const SizedBox(height: 30),
-
               _buildDashboardCard(
                 context,
                 icon: Icons.add_business,
@@ -67,16 +65,15 @@ class EmployerHomeScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) {
                         return PostJobScreen(
-                          selectedLanguage: selectedLanguage,
+                          selectedLanguage:
+                              selectedLanguage,
                         );
                       },
                     ),
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
                 icon: Icons.work,
@@ -88,9 +85,7 @@ class EmployerHomeScreen extends StatelessWidget {
                   _showComingSoon(context);
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
                 icon: Icons.people,
@@ -99,15 +94,24 @@ class EmployerHomeScreen extends StatelessWidget {
                   'applications',
                 ),
                 onTap: () {
-                  _showComingSoon(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EmployerApplicationsScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
-
               const SizedBox(height: 16),
-
               _buildDashboardCard(
                 context,
-                icon: Icons.account_balance_wallet,
+                icon:
+                    Icons.account_balance_wallet,
                 title: AppTranslations.get(
                   selectedLanguage,
                   'payments',
@@ -163,7 +167,9 @@ class EmployerHomeScreen extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context) {
+  void _showComingSoon(
+    BuildContext context,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(

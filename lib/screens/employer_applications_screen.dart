@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../localization/app_translations.dart';
 import '../models/application.dart';
 import '../services/application_store.dart';
+import '../services/job_store.dart';
 import '../services/job_translation_service.dart';
 
-class MyApplicationsScreen extends StatelessWidget {
+class EmployerApplicationsScreen extends StatelessWidget {
   final String selectedLanguage;
 
-  const MyApplicationsScreen({
+  const EmployerApplicationsScreen({
     super.key,
     required this.selectedLanguage,
   });
@@ -17,25 +17,33 @@ class MyApplicationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final applications = ApplicationStore.applications;
 
+    final employerJobIds = JobStore.jobs
+        .map((job) => job.id)
+        .toSet();
+
+    final employerApplications = applications
+        .where(
+          (application) =>
+              employerJobIds.contains(application.job.id),
+        )
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          AppTranslations.get(
-            selectedLanguage,
-            'myApplications',
-          ),
+        title: const Text(
+          'Applications',
         ),
         centerTitle: true,
       ),
       body: SafeArea(
-        child: applications.isEmpty
+        child: employerApplications.isEmpty
             ? _buildEmptyState()
             : ListView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: applications.length,
+                itemCount: employerApplications.length,
                 itemBuilder: (context, index) {
                   return _buildApplicationCard(
-                    applications[index],
+                    employerApplications[index],
                   );
                 },
               ),
@@ -44,31 +52,28 @@ class MyApplicationsScreen extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return const Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.assignment_outlined,
+            Icon(
+              Icons.people_outline,
               size: 70,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(
-              AppTranslations.get(
-                selectedLanguage,
-                'myApplications',
-              ),
+              'No applications yet',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Your job applications will appear here.',
+            SizedBox(height: 8),
+            Text(
+              'Applications from workers will appear here.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -102,20 +107,35 @@ class MyApplicationsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 const Icon(
-                  Icons.work,
+                  Icons.person,
                   size: 40,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    translation.title,
-                    style: const TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        application.workerName,
+                        style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Worker Application',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 _buildStatusBadge(
@@ -124,6 +144,11 @@ class MyApplicationsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 18),
+            _buildDetailRow(
+              Icons.work,
+              'Job',
+              translation.title,
+            ),
             _buildDetailRow(
               Icons.location_on,
               'Location',
@@ -189,7 +214,8 @@ class MyApplicationsScreen extends StatelessWidget {
         bottom: 12,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Icon(
             icon,
