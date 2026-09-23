@@ -7,6 +7,7 @@ import 'job_list_screen.dart';
 import 'my_applications_screen.dart';
 import 'my_contracts_screen.dart';
 import 'my_earnings_screen.dart';
+import 'my_payments_screen.dart';
 import 'my_work_screen.dart';
 
 class WorkerHomeScreen extends StatelessWidget {
@@ -167,7 +168,31 @@ class WorkerHomeScreen extends StatelessWidget {
                         return MyEarningsScreen(
                           selectedLanguage:
                               selectedLanguage,
-                          workerName: workerName,
+                          workerName:
+                              workerName,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              _buildDashboardCard(
+                context,
+                icon: Icons.payments,
+                title: 'My Payments',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MyPaymentsScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                          workerName:
+                              workerName,
                         );
                       },
                     ),

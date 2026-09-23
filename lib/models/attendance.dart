@@ -5,6 +5,7 @@ class AttendanceRecord {
   final JobContract contract;
   final String workerName;
   final String date;
+  final int contractDayNumber;
   String status;
   final DateTime markedAt;
   DateTime? verifiedAt;
@@ -14,6 +15,7 @@ class AttendanceRecord {
     required this.contract,
     required this.workerName,
     required this.date,
+    required this.contractDayNumber,
     required this.status,
     required this.markedAt,
     this.verifiedAt,

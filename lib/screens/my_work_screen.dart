@@ -102,6 +102,41 @@ class _MyWorkScreenState
       date: today,
     );
 
+    final todayDate = _dateOnly(
+      DateTime.now(),
+    );
+
+    final startDate =
+        _parseContractDate(
+      contract.startDate,
+    );
+
+    final endDate =
+        _parseContractDate(
+      contract.endDate,
+    );
+
+    final isBeforeContract =
+        startDate != null &&
+            todayDate.isBefore(startDate);
+
+    final isAfterContract =
+        endDate != null &&
+            todayDate.isAfter(endDate);
+
+    final isWithinContract =
+        !isBeforeContract &&
+            !isAfterContract;
+
+    final contractDayNumber =
+        isWithinContract &&
+                startDate != null
+            ? todayDate
+                    .difference(startDate)
+                    .inDays +
+                1
+            : null;
+
     return Card(
       elevation: 3,
       margin:
@@ -187,13 +222,31 @@ class _MyWorkScreenState
             const SizedBox(
               height: 10,
             ),
+            _buildContractDateStatus(
+              isBeforeContract:
+                  isBeforeContract,
+              isAfterContract:
+                  isAfterContract,
+              isWithinContract:
+                  isWithinContract,
+              contractDayNumber:
+                  contractDayNumber,
+              startDate:
+                  startDate,
+              endDate:
+                  endDate,
+            ),
+            const SizedBox(
+              height: 14,
+            ),
             _buildAttendanceStatus(
               attendance,
             ),
             const SizedBox(
               height: 14,
             ),
-            if (attendance == null)
+            if (attendance == null &&
+                isWithinContract)
               SizedBox(
                 width:
                     double.infinity,
@@ -207,8 +260,9 @@ class _MyWorkScreenState
                   icon: const Icon(
                     Icons.check_circle,
                   ),
-                  label: const Text(
-                    'Mark Today\'s Attendance',
+                  label: Text(
+                    'Mark Today\'s Attendance'
+                    '${contractDayNumber != null ? ' - Day $contractDayNumber' : ''}',
                   ),
                 ),
               ),
@@ -216,6 +270,117 @@ class _MyWorkScreenState
         ),
       ),
     );
+  }
+
+  Widget _buildContractDateStatus({
+    required bool isBeforeContract,
+    required bool isAfterContract,
+    required bool isWithinContract,
+    required int? contractDayNumber,
+    required DateTime? startDate,
+    required DateTime? endDate,
+  }) {
+    if (isBeforeContract) {
+      return Container(
+        width: double.infinity,
+        padding:
+            const EdgeInsets.all(14),
+        decoration:
+            BoxDecoration(
+          borderRadius:
+              BorderRadius.circular(10),
+          color:
+              Colors.orange.shade50,
+        ),
+        child: const Row(
+          children: [
+            Icon(
+              Icons.schedule,
+              color: Colors.orange,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Work has not started yet. Attendance can be marked from the contract start date.',
+                style: TextStyle(
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isAfterContract) {
+      return Container(
+        width: double.infinity,
+        padding:
+            const EdgeInsets.all(14),
+        decoration:
+            BoxDecoration(
+          borderRadius:
+              BorderRadius.circular(10),
+          color:
+              Colors.red.shade50,
+        ),
+        child: const Row(
+          children: [
+            Icon(
+              Icons.event_busy,
+              color: Colors.red,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'This contract has ended. Attendance can no longer be marked.',
+                style: TextStyle(
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isWithinContract &&
+        contractDayNumber != null) {
+      return Container(
+        width: double.infinity,
+        padding:
+            const EdgeInsets.all(14),
+        decoration:
+            BoxDecoration(
+          borderRadius:
+              BorderRadius.circular(10),
+          color:
+              Colors.green.shade50,
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.today,
+              color: Colors.green,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Today is Contract Day $contractDayNumber.',
+                style: const TextStyle(
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildAttendanceStatus(
@@ -226,7 +391,8 @@ class _MyWorkScreenState
         width: double.infinity,
         padding:
             const EdgeInsets.all(14),
-        decoration: BoxDecoration(
+        decoration:
+            BoxDecoration(
           borderRadius:
               BorderRadius.circular(10),
           color:
@@ -258,22 +424,24 @@ class _MyWorkScreenState
         width: double.infinity,
         padding:
             const EdgeInsets.all(14),
-        decoration: BoxDecoration(
+        decoration:
+            BoxDecoration(
           borderRadius:
               BorderRadius.circular(10),
           color:
               Colors.green.shade50,
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.verified,
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Attendance verified by employer.',
-                style: TextStyle(
+                'Attendance verified by employer. Contract Day ${attendance.contractDayNumber}.',
+                style:
+                    const TextStyle(
                   fontWeight:
                       FontWeight.w600,
                 ),
@@ -290,7 +458,8 @@ class _MyWorkScreenState
         width: double.infinity,
         padding:
             const EdgeInsets.all(14),
-        decoration: BoxDecoration(
+        decoration:
+            BoxDecoration(
           borderRadius:
               BorderRadius.circular(10),
           color:
@@ -320,22 +489,24 @@ class _MyWorkScreenState
       width: double.infinity,
       padding:
           const EdgeInsets.all(14),
-      decoration: BoxDecoration(
+      decoration:
+          BoxDecoration(
         borderRadius:
             BorderRadius.circular(10),
         color:
             Colors.blue.shade50,
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.hourglass_top,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Attendance marked. Waiting for employer verification.',
-              style: TextStyle(
+              'Attendance marked for Contract Day ${attendance.contractDayNumber}. Waiting for employer verification.',
+              style:
+                  const TextStyle(
                 fontWeight:
                     FontWeight.w600,
               ),
@@ -349,7 +520,63 @@ class _MyWorkScreenState
   void _markAttendance(
     JobContract contract,
   ) {
-    final today = _formatToday();
+    final todayDate = _dateOnly(
+      DateTime.now(),
+    );
+
+    final startDate =
+        _parseContractDate(
+      contract.startDate,
+    );
+
+    final endDate =
+        _parseContractDate(
+      contract.endDate,
+    );
+
+    if (startDate == null ||
+        endDate == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to determine the contract dates.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (todayDate.isBefore(
+      startDate,
+    )) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            'Work starts on ${contract.startDate}. Attendance cannot be marked before the start date.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (todayDate.isAfter(
+      endDate,
+    )) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            'This contract ended on ${contract.endDate}. Attendance cannot be marked now.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final today =
+        _formatDate(todayDate);
 
     final existingAttendance =
         AttendanceStore
@@ -370,6 +597,12 @@ class _MyWorkScreenState
       return;
     }
 
+    final contractDayNumber =
+        todayDate
+                .difference(startDate)
+                .inDays +
+            1;
+
     final attendance =
         AttendanceRecord(
       id: DateTime.now()
@@ -379,6 +612,8 @@ class _MyWorkScreenState
       workerName:
           contract.workerName,
       date: today,
+      contractDayNumber:
+          contractDayNumber,
       status:
           'Pending Verification',
       markedAt: DateTime.now(),
@@ -392,26 +627,92 @@ class _MyWorkScreenState
 
     ScaffoldMessenger.of(context)
         .showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          'Attendance marked successfully. Waiting for employer verification.',
+          'Attendance marked for Contract Day $contractDayNumber. Waiting for employer verification.',
         ),
       ),
     );
   }
 
+  DateTime? _parseContractDate(
+    String value,
+  ) {
+    final parts =
+        value.trim().split('/');
+
+    if (parts.length != 3) {
+      return null;
+    }
+
+    final day =
+        int.tryParse(parts[0]);
+
+    final month =
+        int.tryParse(parts[1]);
+
+    final yearValue =
+        int.tryParse(parts[2]);
+
+    if (day == null ||
+        month == null ||
+        yearValue == null) {
+      return null;
+    }
+
+    final year = yearValue < 100
+        ? 2000 + yearValue
+        : yearValue;
+
+    final parsed =
+        DateTime(
+      year,
+      month,
+      day,
+    );
+
+    if (parsed.year != year ||
+        parsed.month != month ||
+        parsed.day != day) {
+      return null;
+    }
+
+    return _dateOnly(parsed);
+  }
+
+  DateTime _dateOnly(
+    DateTime value,
+  ) {
+    return DateTime(
+      value.year,
+      value.month,
+      value.day,
+    );
+  }
+
   String _formatToday() {
-    final now = DateTime.now();
+    return _formatDate(
+      _dateOnly(
+        DateTime.now(),
+      ),
+    );
+  }
 
-    final day = now.day
-        .toString()
-        .padLeft(2, '0');
+  String _formatDate(
+    DateTime value,
+  ) {
+    final day =
+        value.day
+            .toString()
+            .padLeft(2, '0');
 
-    final month = now.month
-        .toString()
-        .padLeft(2, '0');
+    final month =
+        value.month
+            .toString()
+            .padLeft(2, '0');
 
-    final year = now.year.toString();
+    final year =
+        value.year.toString();
 
     return '$day/$month/$year';
   }
@@ -428,9 +729,7 @@ class _MyWorkScreenState
       decoration:
           BoxDecoration(
         borderRadius:
-            BorderRadius.circular(
-          20,
-        ),
+            BorderRadius.circular(20),
         color:
             Colors.green.shade100,
       ),

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../models/attendance.dart';
 import '../models/earning.dart';
+import '../models/payment.dart';
 import '../services/attendance_store.dart';
 import '../services/earning_store.dart';
+import '../services/payment_store.dart';
 
 class AttendanceVerificationScreen extends StatefulWidget {
   final String selectedLanguage;
@@ -309,12 +311,13 @@ class _AttendanceVerificationScreenState
       attendance.id,
     );
 
+    WorkerEarning earning;
+
     if (existingEarning == null) {
       final contract =
           attendance.contract;
 
-      final earning =
-          WorkerEarning(
+      earning = WorkerEarning(
         id: DateTime.now()
             .millisecondsSinceEpoch
             .toString(),
@@ -334,6 +337,35 @@ class _AttendanceVerificationScreenState
       EarningStore.addEarning(
         earning,
       );
+    } else {
+      earning = existingEarning;
+    }
+
+    final existingPayment =
+        PaymentStore.getPaymentForEarning(
+      earning.id,
+    );
+
+    if (existingPayment == null &&
+        earning.isPayable) {
+      final payment =
+          WorkerPayment(
+        id: DateTime.now()
+            .millisecondsSinceEpoch
+            .toString(),
+        earning: earning,
+        workerName:
+            earning.workerName,
+        amount:
+            earning.earnedAmount,
+        createdAt: DateTime.now(),
+        status:
+            'Pending Payment',
+      );
+
+      PaymentStore.addPayment(
+        payment,
+      );
     }
 
     setState(() {});
@@ -342,7 +374,7 @@ class _AttendanceVerificationScreenState
         .showSnackBar(
       const SnackBar(
         content: Text(
-          'Attendance verified and earning recorded successfully.',
+          'Attendance verified, earning recorded, and payment created successfully.',
         ),
       ),
     );
