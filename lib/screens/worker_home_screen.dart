@@ -4,6 +4,7 @@ import '../localization/app_translations.dart';
 import 'job_list_screen.dart';
 import 'my_applications_screen.dart';
 import 'my_contracts_screen.dart';
+import 'my_work_screen.dart';
 
 class WorkerHomeScreen extends StatelessWidget {
   final String selectedLanguage;
@@ -119,12 +120,19 @@ class WorkerHomeScreen extends StatelessWidget {
               _buildDashboardCard(
                 context,
                 icon: Icons.work_history,
-                title: AppTranslations.get(
-                  selectedLanguage,
-                  'myWork',
-                ),
+                title: 'My Work',
                 onTap: () {
-                  _showComingSoon(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MyWorkScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 16),
@@ -135,9 +143,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   selectedLanguage,
                   'myProfile',
                 ),
-                onTap: () {
-                  _showComingSoon(context);
-                },
+                onTap: onComingSoon,
               ),
             ],
           ),
@@ -156,9 +162,11 @@ class WorkerHomeScreen extends StatelessWidget {
       elevation: 3,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius:
+            BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding:
+              const EdgeInsets.all(20),
           child: Row(
             children: [
               Icon(
@@ -169,9 +177,11 @@ class WorkerHomeScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style:
+                      const TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
               ),
@@ -186,15 +196,8 @@ class WorkerHomeScreen extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(
-    BuildContext context,
-  ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'This feature will be connected soon.',
-        ),
-      ),
-    );
+  void onComingSoon() {
+    // This will be replaced when the
+    // corresponding feature is implemented.
   }
 }

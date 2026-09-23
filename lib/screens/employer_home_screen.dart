@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
+import 'attendance_verification_screen.dart';
 import 'employer_applications_screen.dart';
 import 'post_job_screen.dart';
 
@@ -110,8 +111,26 @@ class EmployerHomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildDashboardCard(
                 context,
-                icon:
-                    Icons.account_balance_wallet,
+                icon: Icons.fact_check,
+                title: 'Attendance Verification',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return AttendanceVerificationScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildDashboardCard(
+                context,
+                icon: Icons.account_balance_wallet,
                 title: AppTranslations.get(
                   selectedLanguage,
                   'payments',
@@ -137,9 +156,11 @@ class EmployerHomeScreen extends StatelessWidget {
       elevation: 3,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius:
+            BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding:
+              const EdgeInsets.all(20),
           child: Row(
             children: [
               Icon(
@@ -152,7 +173,8 @@ class EmployerHomeScreen extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
               ),
@@ -170,7 +192,8 @@ class EmployerHomeScreen extends StatelessWidget {
   void _showComingSoon(
     BuildContext context,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
       const SnackBar(
         content: Text(
           'This feature will be connected soon.',
