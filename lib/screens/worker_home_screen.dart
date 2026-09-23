@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_translations.dart';
+import '../services/contract_store.dart';
+
 import 'job_list_screen.dart';
 import 'my_applications_screen.dart';
 import 'my_contracts_screen.dart';
+import 'my_earnings_screen.dart';
 import 'my_work_screen.dart';
 
 class WorkerHomeScreen extends StatelessWidget {
@@ -16,6 +19,12 @@ class WorkerHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contracts = ContractStore.contracts;
+
+    final workerName = contracts.isNotEmpty
+        ? contracts.first.workerName
+        : 'Worker';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -54,6 +63,7 @@ class WorkerHomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
+
               _buildDashboardCard(
                 context,
                 icon: Icons.search,
@@ -75,7 +85,9 @@ class WorkerHomeScreen extends StatelessWidget {
                   );
                 },
               ),
+
               const SizedBox(height: 16),
+
               _buildDashboardCard(
                 context,
                 icon: Icons.assignment,
@@ -97,7 +109,9 @@ class WorkerHomeScreen extends StatelessWidget {
                   );
                 },
               ),
+
               const SizedBox(height: 16),
+
               _buildDashboardCard(
                 context,
                 icon: Icons.description,
@@ -116,7 +130,9 @@ class WorkerHomeScreen extends StatelessWidget {
                   );
                 },
               ),
+
               const SizedBox(height: 16),
+
               _buildDashboardCard(
                 context,
                 icon: Icons.work_history,
@@ -135,7 +151,32 @@ class WorkerHomeScreen extends StatelessWidget {
                   );
                 },
               ),
+
               const SizedBox(height: 16),
+
+              _buildDashboardCard(
+                context,
+                icon:
+                    Icons.account_balance_wallet,
+                title: 'My Earnings',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return MyEarningsScreen(
+                          selectedLanguage:
+                              selectedLanguage,
+                          workerName: workerName,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 16),
+
               _buildDashboardCard(
                 context,
                 icon: Icons.person,
@@ -177,8 +218,7 @@ class WorkerHomeScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style:
-                      const TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight:
                         FontWeight.w600,
